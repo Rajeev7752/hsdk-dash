@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Game Player Information</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      /* Custom styles for Inter font and general body styling */
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f3f4f6; /* Light gray background */
+        display: flex;
+        justify-content: center;
+        align-items: flex-start; /* Align to start to prevent table from being vertically centered too much */
+        min-height: 100vh; /* Minimum height to occupy full viewport */
+        padding: 2rem 0; /* Add some vertical padding */
+      }
+      /* Ensure table cells have padding */
+      th,
+      td {
+        padding: 0.75rem 1rem;
+        text-align: left;
+      }
+    </style>
+  </head>
+  <body class="antialiased p-0">
+    <aside
+      class="bg-gray-800 text-white p-4 flex flex-col h-screen rounded-r-lg shadow-lg max-w-60 overflow-hidden"
+    >
+      <nav>
+        <ul class="text-sm">
+          <li class="mb-4">
+            <a
+              href="#"
+              id="initBtn"
+              class="border-2 border-indigo-800 block py-2 px-4 rounded-lg hover:bg-indigo-600 transition duration-200 bg-indigo-500 font-bold"
+              >Initialize Issue View</a
+            >
+          </li>
+          <li class="mb-4">
+            <input
+              type="text"
+              id="issueIdInput"
+              class="shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out"
+              placeholder="Enter issue id"
+            />
+          </li>
+          <li class="mb-4 w-[50%] float-left p-1">
+            <a
+              href="#"
+              id="showIssue1"
+              class="block py-2 px-2 rounded-lg bg-cyan-500 hover:bg-cyan-700 transition duration-200 font-bold text-gray-800"
+            >
+              Compact issue
+            </a>
+          </li>
+          <li class="mb-4 w-[50%] float-left p-1">
+            <a
+              href="#"
+              id="showIssue2"
+              class="block py-2 px-2 rounded-lg bg-orange-500 hover:bg-orange-700 transition duration-200 font-bold text-gray-800"
+            >
+              Default issue
+            </a>
+          </li>
+          <li class="mb-4 clear-both">
+            <a
+              href="#"
+              id="addEventListener"
+              class="block py-2 px-4 rounded-lg hover:bg-green-400 bg-green-600 transition duration-200"
+            >
+              Event - issueLoaded
+            </a>
+          </li>
+          <li class="mb-4">
+            <a
+              href="#"
+              id="addEventListener2"
+              class="block py-2 px-4 rounded-lg hover:bg-green-400 bg-green-600 transition duration-200"
+            >
+              Event - newMessageReceived
+            </a>
+          </li>
+          <li class="mb-4">
+            <a
+              href="#"
+              id="addEventListener3"
+              class="block py-2 px-4 rounded-lg hover:bg-green-400 bg-green-600 transition duration-200"
+            >
+              Event - issueUpdated
+            </a>
+          </li>
+          <li><hr /></li>
+          <li class="mt-4 mb-4 float-left">
+            <a
+              href="#"
+              id="showListPlusCompact"
+              class="border-2 border-indigo-800 block py-2 px-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 transition duration-200 font-bold text-white-800"
+            >
+              Initialize Issue list + Compact issue view
+            </a>
+          </li>
+          <li class="mb-4 clear-both">
+            <a
+              href="#"
+              id="addEventListener4"
+              class="block py-2 px-4 rounded-lg hover:bg-green-400 bg-green-600 transition duration-200"
+            >
+              Event - issueSortOrder
+            </a>
+          </li>
+          <li class="mb-4">
+            <a
+              href="#"
+              id="addEventListener5"
+              class="block py-2 px-4 rounded-lg hover:bg-green-400 bg-green-600 transition duration-200"
+            >
+              Event - smartViewChanged
+            </a>
+          </li>
+          <li class="mb-4">
+            <a
+              href="#"
+              id="addEventListener6"
+              class="block py-2 px-4 rounded-lg hover:bg-green-400 bg-green-600 transition duration-200"
+            >
+              Event - listUpdated
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+    <div
+      class="container grid grid-cols-2 gap-4 p-4 h-screen"
+      id="embedded-dash"
+    >
+      <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+        <iframe
+          id="hsif"
+          src=""
+          frameborder="0"
+          width="100%"
+          height="100%"
+        ></iframe>
+      </div>
+      <div
+        class="p-4 bg-white shadow-lg rounded-lg overflow-auto"
+        id="dummy-table"
+      >
+        <h1
+          class="text-3xl font-bold text-gray-800 mb-6 text-center"
+          id="eventNameInfo"
+        ></h1>
+
+        <!-- Responsive Table Container -->
+        <div>
+          <div id="eventDataInfo"></div>
+        </div>
+      </div>
+
+      <div
+        class="bg-white shadow-lg rounded-lg overflow-auto hidden"
+        id="secondary-iframe"
+      >
+        <iframe
+          id="hsif2"
+          src=""
+          frameborder="0"
+          width="100%"
+          height="100%"
+        ></iframe>
+      </div>
+    </div>
+  </body>
+
+  <script
+    type="text/javascript"
+    src="https://sbox-shubz.helpshift.mobi/static/bundles/hsdk/hsdk-min.js"
+  ></script>
+
+  <script type="text/javascript">
+    const siteUrl = "https://sbox-shubz.helpshift.mobi";
+
+    let issueOpenedAfterSelect = false;
+
+    //==================================================================================
+    // Code for intialisation
+    //==================================================================================
+
+    document.getElementById("initBtn").addEventListener("click", () => {
+      // This doesnt seem to work with local.
+      const iframe = document.getElementById("hsif");
+
+      HSDK("init", iframe, siteUrl, "2", "compact");
+
+      // Hide unnecessary panels when switching between views.
+      document.getElementById("secondary-iframe").classList.add("hidden");
+    });
+
+    document.getElementById("showIssue1").addEventListener("click", () => {
+      const id = document.getElementById("issueIdInput").value.trim();
+
+      HSDK("openIssue", id, "compact");
+      document.getElementById("dummy-table").classList.remove("hidden");
+      document.getElementById("embedded-dash").classList.remove("grid-cols-1");
+      document.getElementById("embedded-dash").classList.add("grid-cols-2");
+    });
+
+    document.getElementById("showIssue2").addEventListener("click", () => {
+      const id = document.getElementById("issueIdInput").value.trim();
+
+      HSDK("openIssue", id, "default");
+
+      document.getElementById("dummy-table").classList.add("hidden");
+      document.getElementById("embedded-dash").classList.remove("grid-cols-2");
+      document.getElementById("embedded-dash").classList.add("grid-cols-1");
+    });
+
+    document
+      .getElementById("showListPlusCompact")
+      .addEventListener("click", () => {
+        const iframe = document.getElementById("hsif");
+        HSDK("init", iframe, siteUrl, "0-6", "issueList");
+
+        document.getElementById("dummy-table").classList.add("hidden");
+        document.getElementById("secondary-iframe").classList.remove("hidden");
+        issueOpenedAfterSelect = false;
+      });
+
+    //==================================================================================
+    // Code for event listeners
+    //==================================================================================
+
+    const _updateEventInfo = (eventName, eventData) => {
+      document.getElementById("eventNameInfo").innerHTML = eventName;
+      document.getElementById("eventDataInfo").innerHTML =
+        JSON.stringify(eventData);
+
+      console.log("Event Name: " + eventName);
+      console.log(JSON.stringify(eventData));
+    };
+
+    document
+      .getElementById("addEventListener")
+      .addEventListener("click", () => {
+        HSDK("addEventListener", "issueLoaded", (ev) => {
+          _updateEventInfo("issueLoaded", ev.data);
+          document.getElementById("issueLoadedId").innerHTML =
+            ev.data.issue.publishId;
+        });
+
+        HSDK("addEventListener", "issueLoadFailed", (ev) => {
+          _updateEventInfo("issueLoadFailed", ev.data);
+        });
+      });
+
+    document
+      .getElementById("addEventListener2")
+      .addEventListener("click", () => {
+        console.log("boom");
+        HSDK("addEventListener", "newMessageReceived", (ev) => {
+          console.log(ev);
+          document.getElementById("eventNameInfo").innerHTML = ev.type;
+          document.getElementById("eventDataInfo").innerHTML =
+            ev.data.msg.meta.issue_title;
+        });
+      });
+
+    document
+      .getElementById("addEventListener3")
+      .addEventListener("click", () => {
+        HSDK("addEventListener", "issueUpdated", (ev) => {
+          console.log("issueUpdated event received", ev);
+          document.getElementById("eventNameInfo").innerHTML = ev.type;
+          document.getElementById("eventDataInfo").innerHTML = JSON.stringify(
+            ev.data,
+          );
+        });
+      });
+
+    HSDK("addEventListener", "issueSelected", (ev) => {
+      console.log("issueSelected", ev.data);
+      const selectedIssueId = ev.data;
+
+      const iframe2 = document.getElementById("hsif2");
+
+      if (issueOpenedAfterSelect) {
+        HSDK("openIssue", selectedIssueId, "compact");
+      } else {
+        HSDK("init", iframe2, siteUrl, "2", "compact");
+        HSDK("openIssue", selectedIssueId, "compact");
+        issueOpenedAfterSelect = true;
+      }
+    });
+
+    document
+      .getElementById("addEventListener4")
+      .addEventListener("click", () => {
+        HSDK("addEventListener", "issueSortOrder", (ev) => {
+          console.log("issueSortOrder event received", ev);
+          _updateEventInfo("issueSortOrder", ev.data);
+        });
+      });
+
+    document
+      .getElementById("addEventListener5")
+      .addEventListener("click", () => {
+        HSDK("addEventListener", "smartViewChanged", (ev) => {
+          console.log("smartViewChanged event received", ev);
+          _updateEventInfo("smartViewChanged", ev.data);
+        });
+      });
+
+    document
+      .getElementById("addEventListener6")
+      .addEventListener("click", () => {
+        HSDK("addEventListener", "issueListUpdated", (ev) => {
+          console.log("issueListUpdated event received", ev);
+          _updateEventInfo("issueListUpdated", ev.data);
+        });
+      });
+  </script>
+</html>
